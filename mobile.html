@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gingoog Gadgets Premium PWA</title>
+    
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Gingoog%20Gadgets%20Premium%22%2C%22short_name%22%3A%22Gadgets%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2305050a%22%2C%22theme_color%22%3A%22%2300f2fe%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzA1MDUwYSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSIjMDBmMmZlIi8%2BPC9zdmc%2B%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+    <meta name="theme-color" content="#05050a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        midnight: '#05050a',
+                        brand: { cyan: '#00f2fe', blue: '#4facfe', pink: '#ff0844', purple: '#b224ef' }
+                    },
+                    animation: {
+                        'aurora': 'aurora 15s ease-in-out infinite alternate',
+                        'spin-slow': 'spin 8s linear infinite',
+                        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-up': 'fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        aurora: {
+                            '0%': { transform: 'translate(0, 0) scale(1) rotate(0deg)' },
+                            '50%': { transform: 'translate(5vw, 10vh) scale(1.2) rotate(180deg)' },
+                            '100%': { transform: 'translate(-5vw, -5vh) scale(0.9) rotate(360deg)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #05050a; color: #ffffff; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        .aurora-container { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: radial-gradient(circle at 50% 50%, #0a0a14 0%, #05050a 100%); }
+        .aurora-blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.6; mix-blend-mode: screen; }
+        .aurora-1 { top: -10%; left: -10%; width: 60vw; height: 60vw; background: #b224ef; animation: aurora 20s infinite alternate; }
+        .aurora-2 { bottom: -10%; right: -10%; width: 70vw; height: 70vw; background: #4facfe; animation: aurora 25s infinite alternate-reverse; }
+        .aurora-3 { top: 30%; left: 20%; width: 50vw; height: 50vw; background: #00f2fe; animation: aurora 18s infinite alternate; animation-delay: -5s; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .clay {
+            background: rgba(20, 25, 40, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.6), -4px -4px 16px rgba(255, 255, 255, 0.03), inset 1px 1px 3px rgba(255, 255, 255, 0.15), inset -2px -2px 6px rgba(0, 0, 0, 0.5);
+        }
+        
+        .clay-btn {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02)); backdrop-filter: blur(10px);
+            box-shadow: 4px 4px 12px rgba(0,0,0,0.5), inset 1px 1px 2px rgba(255,255,255,0.2), inset -1px -1px 3px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s ease;
+        }
+        .clay-btn:active { box-shadow: inset 2px 2px 5px rgba(0,0,0,0.6), inset -1px -1px 2px rgba(255,255,255,0.1); transform: scale(0.97); }
+
+        .clay-input {
+            background: rgba(10, 15, 25, 0.5); border: 1px solid transparent; transition: all 0.3s;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.6), inset -2px -2px 4px rgba(255,255,255,0.05);
+        }
+        .clay-input:focus { border-color: rgba(0, 242, 254, 0.4); box-shadow: inset 2px 2px 4px rgba(0,0,0,0.7), 0 0 15px rgba(0, 242, 254, 0.15); }
+        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px #0a0f19 inset !important; -webkit-text-fill-color: white !important;
+        }
+        .progress-ring__circle { transition: stroke-dashoffset 1s ease-in-out; transform: rotate(-90deg); transform-origin: 50% 50%; }
+    </style>
+</head>
+<body class="antialiased w-screen h-screen flex justify-center items-center md:p-6 lg:p-10">
+
+    <div class="aurora-container">
+        <div class="aurora-blob aurora-1"></div>
+        <div class="aurora-blob aurora-2"></div>
+        <div class="aurora-blob aurora-3"></div>
+    </div>
+
+    <!-- Responsive Main App Container: Max width expands on desktop -->
+    <div class="w-full h-full md:max-w-7xl mx-auto relative flex flex-col md:rounded-[2.5rem] md:border-4 md:border-gray-800/50 overflow-hidden shadow-2xl bg-black/10 transition-all duration-300">
+        
+        <!-- Login View -->
+        <div id="login-view" class="absolute inset-0 z-50 flex flex-col justify-center items-center p-8 transition-all duration-700 backdrop-blur-xl bg-black/40 md:bg-black/20">
+            <div class="w-full max-w-md flex flex-col items-center">
+                <div class="relative w-32 h-32 md:w-40 md:h-40 mb-8">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-brand-blue to-brand-cyan rounded-full animate-spin-slow opacity-50 blur-xl"></div>
+                    <div class="absolute inset-0 clay rounded-full flex items-center justify-center text-5xl md:text-6xl bg-gradient-to-br from-white/20 to-transparent border-[3px] border-white/20 shadow-[0_0_40px_rgba(0,242,254,0.3)]">
+                        <i class="fa-solid fa-cube text-transparent bg-clip-text bg-gradient-to-tr from-brand-cyan to-white"></i>
+                    </div>
+                </div>
+                
+                <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-2 text-center">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-white">Gingoog</span>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-brand-blue block mt-1">Gadgets</span>
+                </h1>
+                <p class="text-gray-400 text-center mb-12 text-sm md:text-base font-medium tracking-wide uppercase">Offline Ready PWA</p>
+                
+                <button id="login-btn" onclick="handleLogin()" class="w-full bg-gradient-to-r from-brand-blue to-brand-cyan text-white font-bold py-4 rounded-2xl shadow-[0_10px_30px_rgba(0,242,254,0.4)] hover:shadow-[0_15px_40px_rgba(0,242,254,0.6)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-lg border border-white/20">
+                    <i class="fa-solid fa-fingerprint text-2xl"></i> Access Dashboard
+                </button>
+                <p class="text-[10px] md:text-xs text-gray-500 mt-8 text-center uppercase tracking-widest font-semibold flex items-center gap-2">
+                    <span class="w-8 h-[1px] bg-gray-500"></span> Works Bisan Walay Internet <span class="w-8 h-[1px] bg-gray-500"></span>
+                </p>
+            </div>
+        </div>
+
+        <!-- App View (Split Layout on Desktop, Stacked on Mobile) -->
+        <div id="app-view" class="absolute inset-0 hidden flex-col md:flex-row transition-opacity duration-700 opacity-0 bg-transparent">
+            
+            <!-- Sidebar / Top Header section -->
+            <div class="flex flex-col w-full md:w-80 lg:w-96 shrink-0 border-b md:border-b-0 md:border-r border-white/10 bg-black/20 z-20 md:h-full">
+                <!-- Header with Install Button -->
+                <header class="pt-12 md:pt-10 pb-4 px-6 flex justify-between items-center z-20 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 md:w-14 md:h-14 clay rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-user-tie text-brand-cyan md:text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-bold text-white tracking-wide leading-tight">Dashboard</h1>
+                            <p class="text-xs text-brand-cyan font-medium flex items-center gap-1" id="user-display-name">
+                                <i class="fa-solid fa-circle-check text-[10px]"></i> Cloud Synced
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <!-- Install App Prompt Button -->
+                        <button id="install-btn" onclick="installPWA()" class="hidden w-12 h-12 md:w-14 md:h-14 clay-btn rounded-full flex items-center justify-center text-brand-cyan relative" title="Install App">
+                            <i class="fa-solid fa-download"></i>
+                            <span class="absolute top-0 right-0 w-3 h-3 bg-brand-pink rounded-full border-2 border-[#05050a] animate-pulse"></span>
+                        </button>
+                        <button onclick="handleLogout()" class="w-12 h-12 md:w-14 md:h-14 clay-btn rounded-full flex items-center justify-center text-brand-pink" title="Sign Out">
+                            <i class="fa-solid fa-power-off"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <section class="px-6 py-4 z-10 shrink-0 md:flex-1">
+                    <div class="grid grid-cols-2 md:grid-cols-1 gap-4">
+                        <button onclick="setFilter('all')" class="clay rounded-[1.5rem] p-5 text-left relative overflow-hidden group focus:outline-none cursor-pointer">
+                            <div id="filter-all-bg" class="absolute inset-0 bg-gradient-to-br from-brand-blue/20 to-transparent opacity-0 transition-opacity duration-300"></div>
+                            <div class="relative z-10 flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs md:text-sm text-gray-300 font-semibold uppercase tracking-wider mb-1">Total Stock</p>
+                                    <h2 class="text-4xl md:text-5xl font-bold text-white" id="total-items">0</h2>
+                                </div>
+                                <div class="relative w-12 h-12 md:w-16 md:h-16">
+                                    <svg class="w-full h-full" viewBox="0 0 48 48">
+                                        <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.05)" stroke-width="4" fill="none" />
+                                        <circle id="svg-total" cx="24" cy="24" r="20" stroke="#00f2fe" stroke-width="4" fill="none" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round" class="progress-ring__circle" />
+                                    </svg>
+                                    <i class="fa-solid fa-box absolute inset-0 m-auto w-fit h-fit text-[10px] md:text-xs text-brand-cyan"></i>
+                                </div>
+                            </div>
+                        </button>
+                        
+                        <button onclick="setFilter('low')" class="clay rounded-[1.5rem] p-5 text-left relative overflow-hidden group focus:outline-none cursor-pointer">
+                            <div id="filter-low-bg" class="absolute inset-0 bg-gradient-to-br from-brand-pink/20 to-transparent opacity-0 transition-opacity duration-300"></div>
+                            <div class="relative z-10 flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs md:text-sm text-gray-300 font-semibold uppercase tracking-wider mb-1">Low Qty</p>
+                                    <h2 class="text-4xl md:text-5xl font-bold text-white" id="low-stock-count">0</h2>
+                                </div>
+                                <div class="relative w-12 h-12 md:w-16 md:h-16">
+                                    <svg class="w-full h-full" viewBox="0 0 48 48">
+                                        <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.05)" stroke-width="4" fill="none" />
+                                        <circle id="svg-low" cx="24" cy="24" r="20" stroke="#ff0844" stroke-width="4" fill="none" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round" class="progress-ring__circle" />
+                                    </svg>
+                                    <i class="fa-solid fa-bolt absolute inset-0 m-auto w-fit h-fit text-[10px] md:text-xs text-brand-pink"></i>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="flex-1 flex flex-col relative h-full min-w-0 overflow-hidden bg-transparent">
+                <div id="filter-status" class="hidden mx-6 mt-2 md:mt-8 mb-2 clay items-center justify-between px-4 py-2 rounded-xl !bg-brand-pink/10 border-brand-pink/30 z-10 shrink-0">
+                    <span class="text-xs font-semibold text-brand-pink flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation animate-pulse"></i> Showing Alerts</span>
+                    <button onclick="setFilter('all')" class="text-xs text-white/70 hover:text-white clay-btn px-3 py-1 rounded-lg transition-colors">View All</button>
+                </div>
+
+                <section class="flex-1 overflow-y-auto no-scrollbar px-6 pb-28 md:pb-8 pt-2 md:pt-8 z-10 relative">
+                    <div id="loading-indicator" class="absolute inset-0 flex items-center justify-center flex-col gap-4 hidden z-20">
+                        <div class="relative w-16 h-16">
+                            <div class="absolute inset-0 rounded-full border-4 border-white/10"></div>
+                            <div class="absolute inset-0 rounded-full border-4 border-brand-cyan border-t-transparent animate-spin"></div>
+                        </div>
+                        <span class="text-sm font-medium text-brand-cyan tracking-widest uppercase">Loading Storage...</span>
+                    </div>
+                    <!-- Inventory List Container (Grid on Desktop, Stacked on Mobile) -->
+                    <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 relative"></div>
+                </section>
+
+                <button onclick="openModal()" class="absolute bottom-8 right-8 w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-r from-brand-cyan to-brand-blue text-white shadow-[0_8px_30px_rgba(0,242,254,0.6)] flex items-center justify-center text-2xl md:text-3xl z-30 hover:scale-105 active:scale-95 transition-transform border border-white/30 before:absolute before:inset-0 before:rounded-full before:bg-white/20 before:animate-ping group">
+                    <i class="fa-solid fa-plus relative z-10 transition-transform group-hover:rotate-90"></i>
+                </button>
+                
+                <!-- Fade out at bottom (Mobile specifically needs this due to overflow) -->
+                <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#05050a] md:from-black/40 to-transparent pointer-events-none z-20"></div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Modal (Bottom Sheet on Mobile, Centered Card on Desktop) -->
+        <div id="item-modal" class="absolute md:fixed inset-0 z-[60] hidden flex-col justify-end md:justify-center md:items-center md:p-6">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity" onclick="closeModal()"></div>
+            
+            <div class="relative w-full md:max-w-lg md:w-full clay !bg-[#0f1423]/95 border-t md:border border-white/10 rounded-t-[2.5rem] md:rounded-[2.5rem] p-8 md:p-10 shadow-[0_-15px_40px_rgba(0,0,0,0.8)] md:shadow-[0_20px_50px_rgba(0,0,0,0.8)] animate-slide-up flex flex-col max-h-[85vh] md:max-h-[90vh]">
+                <!-- Drag Handle (Mobile only) -->
+                <div class="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-1.5 bg-white/20 rounded-full md:hidden"></div>
+                
+                <div class="flex justify-between items-center mb-8 mt-2 md:mt-0">
+                    <h2 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-3" id="modal-title">
+                        <i class="fa-solid fa-box-open text-brand-cyan"></i> New Entry
+                    </h2>
+                    <button onclick="closeModal()" class="w-10 h-10 md:w-12 md:h-12 clay-btn rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors">
+                        <i class="fa-solid fa-times md:text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="item-form" class="space-y-5 overflow-y-auto no-scrollbar pb-6 flex-1" onsubmit="saveItem(event)">
+                    <input type="hidden" id="item-id">
+                    <div>
+                        <label class="block text-[11px] md:text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">Gadget Name</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-mobile-screen absolute top-1/2 -translate-y-1/2 left-4 text-brand-cyan/70"></i>
+                            <input type="text" id="item-name" required placeholder="e.g. iPhone 15 Pro" class="w-full clay-input rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none md:text-lg">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] md:text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">Category</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-layer-group absolute top-1/2 -translate-y-1/2 left-4 text-brand-cyan/70"></i>
+                            <select id="item-category" required class="w-full clay-input rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none appearance-none md:text-lg">
+                                <option value="" disabled selected class="bg-gray-900 text-gray-400">Select Classification</option>
+                                <option value="Smartphones" class="bg-gray-900 text-white">Smartphones</option>
+                                <option value="Laptops" class="bg-gray-900 text-white">Laptops & PCs</option>
+                                <option value="Accessories" class="bg-gray-900 text-white">Accessories</option>
+                                <option value="Wearables" class="bg-gray-900 text-white">Wearables</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute top-1/2 -translate-y-1/2 right-4 text-white/40 text-xs pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">Units (Qty)</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-cubes absolute top-1/2 -translate-y-1/2 left-4 text-brand-cyan/70"></i>
+                                <input type="number" id="item-qty" min="0" required placeholder="0" class="w-full clay-input rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none md:text-lg">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] md:text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">Price (₱)</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-peso-sign absolute top-1/2 -translate-y-1/2 left-4 text-brand-cyan/70"></i>
+                                <input type="number" id="item-price" min="0" step="0.01" required placeholder="0.00" class="w-full clay-input rounded-2xl py-4 pl-10 pr-4 text-white placeholder-white/20 focus:outline-none md:text-lg">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" id="save-btn" class="w-full mt-6 md:mt-8 bg-gradient-to-r from-brand-cyan to-brand-blue text-white font-bold py-4 rounded-2xl shadow-[0_10px_20px_rgba(0,242,254,0.3)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2 text-lg md:text-xl border border-white/20 hover:shadow-[0_15px_30px_rgba(0,242,254,0.5)]">
+                        <i class="fa-solid fa-hard-drive"></i> Save Data
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast Notifications (Responsive positioning) -->
+        <div id="toast-container" class="absolute top-6 left-1/2 -translate-x-1/2 md:left-auto md:-translate-x-0 md:right-6 z-[100] flex flex-col gap-3 w-11/12 max-w-sm pointer-events-none"></div>
+    </div>
+
+    <script type="module">
+        // --- 1. Service Worker Injection (PWA) ---
+        const swCode = `
+            const CACHE_NAME = 'gingoog-gadgets-pwa-v3-responsive';
+            const ASSETS = [
+                '/',
+                'https://cdn.tailwindcss.com',
+                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+                'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'
+            ];
+            self.addEventListener('install', (e) => {
+                e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
+            });
+            self.addEventListener('activate', (e) => {
+                e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => { if(k !== CACHE_NAME) return caches.delete(k); }))).then(() => self.clients.claim()));
+            });
+            self.addEventListener('fetch', (e) => {
+                e.respondWith(
+                    fetch(e.request).catch(() => caches.match(e.request).then(res => res || (e.request.mode === 'navigate' ? caches.match('/') : new Response('', {status: 404}))))
+                );
+            });
+        `;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(swUrl).catch(err => console.warn('SW Register Failed:', err));
+        }
+
+        // --- 2. PWA Install Prompt Logic ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); deferredPrompt = e;
+            document.getElementById('install-btn').classList.remove('hidden');
+        });
+        window.installPWA = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') document.getElementById('install-btn').classList.add('hidden');
+                deferredPrompt = null;
+            }
+        };
+
+        // --- 3. App State & Elements ---
+        let currentUser = null, inventoryData = [], currentFilter = 'all', isOfflineMode = false;
+        const LOW_STOCK_THRESHOLD = 10, views = { login: document.getElementById('login-view'), app: document.getElementById('app-view') };
+        const els = {
+            list: document.getElementById('inventory-list'), loading: document.getElementById('loading-indicator'),
+            totalTxt: document.getElementById('total-items'), lowTxt: document.getElementById('low-stock-count'),
+            svgTotal: document.getElementById('svg-total'), svgLow: document.getElementById('svg-low'),
+            toastBox: document.getElementById('toast-container'), filterStatus: document.getElementById('filter-status'),
+            bgAll: document.getElementById('filter-all-bg'), bgLow: document.getElementById('filter-low-bg'),
+            userName: document.getElementById('user-display-name')
+        };
+        const modal = { el: document.getElementById('item-modal'), form: document.getElementById('item-form'), title: document.getElementById('modal-title'), id: document.getElementById('item-id'), name: document.getElementById('item-name'), cat: document.getElementById('item-category'), qty: document.getElementById('item-qty'), price: document.getElementById('item-price'), saveBtn: document.getElementById('save-btn') };
+
+        // Firebase Modules (Loaded dynamically to allow purely offline boot)
+        let db, auth, fbModules = {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'gingoog-gadgets-pwa';
+        
+        // --- 4. Core Logic & Event Listeners ---
+        window.addEventListener('offline', () => {
+            if (!isOfflineMode) { showToast("Network lost. Switched to Local Mode.", "error"); startOfflineMode(); }
+        });
+
+        window.startOfflineMode = () => {
+            isOfflineMode = true; 
+            els.userName.innerHTML = '<i class="fa-solid fa-wifi-slash text-[10px]"></i> Local Offline Storage';
+            els.userName.className = "text-xs text-brand-pink font-bold flex items-center gap-1";
+            
+            const localData = localStorage.getItem('gg_pwa_db');
+            inventoryData = localData ? JSON.parse(localData) : [
+                { id: crypto.randomUUID(), name: "iPhone 15 Pro Max Titanium", category: "Smartphones", qty: 8, price: 85000, createdAt: Date.now() },
+                { id: crypto.randomUUID(), name: "MacBook Pro M3 Max", category: "Laptops", qty: 3, price: 195000, createdAt: Date.now() },
+                { id: crypto.randomUUID(), name: "Apple Watch Ultra 2", category: "Wearables", qty: 15, price: 54000, createdAt: Date.now() },
+                { id: crypto.randomUUID(), name: "AirPods Pro (2nd Gen)", category: "Accessories", qty: 24, price: 14500, createdAt: Date.now() }
+            ];
+            if (!localData) localStorage.setItem('gg_pwa_db', JSON.stringify(inventoryData));
+            
+            renderUI(); switchView('app'); showToast("Running securely without internet", "success");
+        };
+
+        window.handleLogin = async () => {
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-2xl"></i> Loading...';
+            loginBtn.disabled = true;
+
+            // If offline, bypass firebase completely
+            if (!navigator.onLine) { startOfflineMode(); return; }
+
+            try {
+                // Dynamic import to prevent script crash if offline/cache miss
+                const appMod = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+                const authMod = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+                const fsMod = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                fbModules = { ...authMod, ...fsMod };
+
+                let firebaseConfig = { apiKey: "demo-key", authDomain: "demo.firebaseapp.com", projectId: "demo-project" };
+                if (typeof __firebase_config !== 'undefined') { try { firebaseConfig = JSON.parse(__firebase_config); } catch (e) {} }
+
+                const app = appMod.initializeApp(firebaseConfig);
+                auth = fbModules.getAuth(app); db = fbModules.getFirestore(app);
+
+                if (firebaseConfig.apiKey === "demo-key") { startOfflineMode(); return; }
+
+                if (typeof __initial_auth_token !== 'undefined') await fbModules.signInWithCustomToken(auth, __initial_auth_token);
+                else await fbModules.signInAnonymously(auth);
+
+                currentUser = auth.currentUser;
+                els.userName.innerHTML = '<i class="fa-solid fa-cloud text-[10px]"></i> Cloud Synced';
+                els.userName.className = "text-xs text-brand-cyan font-medium flex items-center gap-1";
+                switchView('app'); subscribeToInventory(); showToast("Connected to Cloud", "success");
+
+            } catch (error) {
+                console.warn("Cloud connection failed, falling back to local:", error);
+                startOfflineMode();
+            } finally {
+                loginBtn.innerHTML = '<i class="fa-solid fa-fingerprint text-2xl"></i> Access Dashboard'; loginBtn.disabled = false;
+            }
+        };
+
+        function switchView(target) {
+            const active = target === 'app' ? views.app : views.login;
+            const inactive = target === 'app' ? views.login : views.app;
+            inactive.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => {
+                inactive.classList.add('hidden'); active.classList.remove('hidden'); active.classList.add('flex');
+                void active.offsetWidth; active.classList.replace('opacity-0', 'opacity-100');
+            }, 700);
+        }
+
+        window.handleLogout = () => {
+            isOfflineMode = false; inventoryData = [];
+            if (auth) fbModules.signOut(auth);
+            switchView('login'); showToast("Session Terminated", "info");
+        };
+
+        let unsubscribe = null;
+        function subscribeToInventory() {
+            if (!currentUser || isOfflineMode || !db) return;
+            const invRef = fbModules.collection(db, 'artifacts', appId, 'users', currentUser.uid, 'inventory');
+            if (unsubscribe) unsubscribe();
+            unsubscribe = fbModules.onSnapshot(invRef, (snapshot) => {
+                inventoryData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderUI();
+            }, (err) => { showToast("Sync lost, falling back", 'error'); startOfflineMode(); });
+        }
+
+        window.saveItem = async (e) => {
+            e.preventDefault();
+            const id = modal.id.value;
+            const itemData = {
+                name: modal.name.value.trim(), category: modal.cat.value,
+                qty: parseInt(modal.qty.value), price: parseFloat(modal.price.value), updatedAt: Date.now()
+            };
+            modal.saveBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Saving...'; modal.saveBtn.disabled = true;
+
+            try {
+                if (isOfflineMode || !navigator.onLine) {
+                    if (id) {
+                        const idx = inventoryData.findIndex(i => i.id === id);
+                        if (idx > -1) inventoryData[idx] = { ...inventoryData[idx], ...itemData };
+                    } else { itemData.id = crypto.randomUUID(); itemData.createdAt = Date.now(); inventoryData.push(itemData); }
+                    localStorage.setItem('gg_pwa_db', JSON.stringify(inventoryData));
+                    renderUI(); showToast(id ? "Local Record Updated" : "Local Entry Created", "success");
+                } else {
+                    if (id) await fbModules.setDoc(fbModules.doc(db, 'artifacts', appId, 'users', currentUser.uid, 'inventory', id), itemData, { merge: true });
+                    else { itemData.createdAt = Date.now(); await fbModules.setDoc(fbModules.doc(fbModules.collection(db, 'artifacts', appId, 'users', currentUser.uid, 'inventory')), itemData); }
+                    showToast("Cloud Saved", "success");
+                }
+                closeModal();
+            } catch (error) { showToast("Failed to save", "error"); } 
+            finally { modal.saveBtn.innerHTML = '<i class="fa-solid fa-hard-drive"></i> Save Data'; modal.saveBtn.disabled = false; }
+        };
+
+        window.deleteItem = async (id) => {
+            try {
+                if (isOfflineMode || !navigator.onLine) {
+                    inventoryData = inventoryData.filter(i => i.id !== id);
+                    localStorage.setItem('gg_pwa_db', JSON.stringify(inventoryData));
+                    renderUI(); showToast("Record Purged", "info");
+                } else {
+                    await fbModules.deleteDoc(fbModules.doc(db, 'artifacts', appId, 'users', currentUser.uid, 'inventory', id));
+                    showToast("Cloud Record Purged", "info");
+                }
+            } catch (error) { showToast("Purge failed", "error"); }
+        };
+
+        window.setFilter = (type) => {
+            currentFilter = type; renderUI();
+            if (type === 'low') {
+                els.filterStatus.classList.remove('hidden'); els.filterStatus.classList.add('flex');
+                els.bgLow.classList.replace('opacity-0', 'opacity-100'); els.bgAll.classList.replace('opacity-100', 'opacity-0');
+            } else {
+                els.filterStatus.classList.add('hidden'); els.filterStatus.classList.remove('flex');
+                els.bgAll.classList.replace('opacity-0', 'opacity-100'); els.bgLow.classList.replace('opacity-100', 'opacity-0');
+            }
+        };
+
+        function updateSvgRing(el, current, max) {
+            const perc = max === 0 ? 0 : Math.min(current / max, 1);
+            el.style.strokeDashoffset = 125.6 - (perc * 125.6);
+        }
+
+        function renderUI() {
+            const total = inventoryData.length, lowTotal = inventoryData.filter(i => i.qty < LOW_STOCK_THRESHOLD).length;
+            els.totalTxt.innerText = total; els.lowTxt.innerText = lowTotal;
+            updateSvgRing(els.svgTotal, total, 50); updateSvgRing(els.svgLow, lowTotal, total || 1);
+            
+            const displayData = currentFilter === 'low' ? inventoryData.filter(i => i.qty < LOW_STOCK_THRESHOLD) : inventoryData;
+            renderList(displayData.sort((a, b) => b.createdAt - a.createdAt));
+        }
+
+        const catIcons = { 'Smartphones': 'fa-mobile-screen', 'Laptops': 'fa-laptop', 'Accessories': 'fa-headphones', 'Wearables': 'fa-watch' };
+
+        function renderList(items) {
+            els.list.innerHTML = '';
+            if (items.length === 0) {
+                // col-span-full ensures empty state takes whole grid
+                els.list.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-24 text-white/30 text-center animate-fade-up"><i class="fa-solid fa-ghost text-6xl mb-6 opacity-50"></i><p class="text-xl font-bold">Storage Empty</p></div>`; return;
+            }
+            items.forEach((item, i) => {
+                const isLow = item.qty < LOW_STOCK_THRESHOLD, priceFmt = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(item.price);
+                els.list.innerHTML += `
+                    <div class="clay group relative rounded-[1.5rem] p-5 flex items-center justify-between opacity-0 animate-fade-up ${isLow ? '!border-brand-pink/50' : ''}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
+                        <div class="flex items-center gap-4 relative z-10 w-full pr-14">
+                            <div class="w-14 h-14 clay-btn rounded-[1rem] flex items-center justify-center shrink-0 text-xl ${isLow ? 'text-brand-pink' : 'text-brand-cyan'}">
+                                <i class="fa-solid ${catIcons[item.category] || 'fa-box'}"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="font-bold text-white text-sm md:text-base leading-tight truncate mb-1" title="${item.name}">${item.name}</h3>
+                                <div class="flex items-center gap-2 opacity-80 text-[11px] md:text-xs font-semibold uppercase tracking-wider truncate">
+                                    <span class="${isLow ? 'text-pink-300' : 'text-blue-300'}">${item.category}</span><span class="w-1 h-1 rounded-full bg-white/40"></span><span class="text-gray-300">${priceFmt}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end gap-1 absolute right-5 top-5 z-10">
+                            <span class="font-black text-2xl md:text-3xl leading-none drop-shadow-md ${isLow ? 'text-brand-pink' : 'text-white'}">${item.qty}</span>
+                            ${isLow ? '<span class="text-[8px] md:text-[9px] text-brand-pink bg-brand-pink/10 px-2 py-0.5 rounded uppercase font-bold">Alert</span>' : ''}
+                        </div>
+                        <div class="absolute inset-0 clay !bg-[#0f1423]/95 rounded-[1.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-end px-5 gap-4 z-20">
+                            <button onclick="editItem('${item.id}')" class="w-12 h-12 rounded-full clay-btn text-brand-blue flex items-center justify-center hover:scale-110 transition-transform"><i class="fa-solid fa-pen text-lg"></i></button>
+                            <button onclick="deleteItem('${item.id}')" class="w-12 h-12 rounded-full clay-btn text-brand-pink flex items-center justify-center hover:scale-110 transition-transform"><i class="fa-solid fa-trash text-lg"></i></button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        window.openModal = () => { modal.el.classList.remove('hidden'); modal.el.classList.add('flex'); modal.title.innerHTML = '<i class="fa-solid fa-box-open text-brand-cyan"></i> New Entry'; modal.form.reset(); modal.id.value = ''; modal.cat.selectedIndex = 0; };
+        window.editItem = (id) => {
+            const item = inventoryData.find(i => i.id === id); if (!item) return;
+            modal.el.classList.remove('hidden'); modal.el.classList.add('flex'); modal.title.innerHTML = '<i class="fa-solid fa-pen-to-square text-brand-blue"></i> Edit Record';
+            modal.id.value = item.id; modal.name.value = item.name; modal.cat.value = item.category; modal.qty.value = item.qty; modal.price.value = item.price;
+        };
+        window.closeModal = () => { modal.el.classList.add('hidden'); modal.el.classList.remove('flex'); };
+
+        window.showToast = (msg, type = 'info') => {
+            const toast = document.createElement('div');
+            let colors = type === 'success' ? 'bg-[#102a20]/95 border-emerald-500/40 text-emerald-50' : type === 'error' ? 'bg-[#2a1015]/95 border-rose-500/40 text-rose-50' : 'bg-[#151a2a]/95 border-blue-500/30 text-white';
+            let icon = type === 'success' ? '<i class="fa-solid fa-shield-check text-emerald-400 text-lg"></i>' : type === 'error' ? '<i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg"></i>' : '<i class="fa-solid fa-circle-info text-brand-blue text-lg"></i>';
+            toast.className = `clay flex items-center gap-4 px-5 py-4 rounded-2xl border backdrop-blur-xl animate-slide-up pointer-events-auto shadow-2xl ${colors}`;
+            toast.innerHTML = `${icon} <span class="text-[13px] md:text-sm font-semibold tracking-wide">${msg}</span>`;
+            els.toastBox.appendChild(toast);
+            setTimeout(() => { if (els.toastBox.contains(toast)) { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)'; toast.style.transition = 'all 0.4s'; setTimeout(() => toast.remove(), 400); } }, 3500);
+        };
+
+        // Auto-start offline mode if no network on initial load
+        if (!navigator.onLine) startOfflineMode();
+
+    </script>
+</body>
+</html>
